@@ -8,7 +8,7 @@ import urllib.parse
 import urllib.request
 from urllib.error import HTTPError
 
-from ingest.lib.http import HTTPError as HTTPGetError
+from ingest.lib.http_client import HTTPError as HTTPGetError
 from ingest.lib.supabase import sb_headers
 
 from ingest.ingest import PROJECT_REF

@@ -340,6 +340,26 @@ def normalize_nvd_to_vuln(item: dict) -> dict:
                         vendors.add(parts[3])
                         products.add(parts[4])
     poc_urls = [r["url"] for r in refs if "exploit" in r.get("url", "").lower()]
+    # NVD doesn't have a dedicated remediation field. The closest signal
+    # is vendor advisory URLs in `references` (MS/Cisco/Adobe/etc. security
+    # bulletins). ponytail: vendor list is hard-coded; expand to a lookup
+    # table if we onboard more vendors.
+    _VENDOR_HOSTS = (
+        "microsoft.com", "msrc.microsoft.com", "adobe.com", "cisco.com",
+        "oracle.com", "redhat.com", "vmware.com", "intel.com",
+        "chromium.org", "google.com", "apple.com", "sap.com",
+    )
+    vendor_refs = [
+        r for r in refs
+        if any(host in r.get("url", "").lower() for host in _VENDOR_HOSTS)
+        and r.get("type") in ("Vendor Advisory", "Patch", "Mitigation")
+    ]
+    remediation = None
+    if vendor_refs:
+        remediation = (
+            f"See vendor advisory: {vendor_refs[0]['url']}"
+            + (f" (+{len(vendor_refs) - 1} more)" if len(vendor_refs) > 1 else "")
+        )[:1000]
     return {
         "cve_id": cve,
         "cvss_v3_score": cvss_v3,
@@ -351,6 +371,7 @@ def normalize_nvd_to_vuln(item: dict) -> dict:
         "poc_public": bool(poc_urls),
         "poc_urls": poc_urls,
         "description": desc_en[:2000] if desc_en else None,
+        "remediation": remediation,
         "vendors": sorted(vendors),
         "products": sorted(products),
         "refs": [{"source": "nvd", "url": r["url"], "kind": r.get("type","reference")} for r in refs[:15]],

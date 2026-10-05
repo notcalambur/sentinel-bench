@@ -15,5 +15,8 @@
     "@vercel/analytics": "^2.0.1",
     "astro": "^5.0.0",
     "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43"
   }
 }
