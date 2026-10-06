@@ -84,6 +84,7 @@ def fetch_kev() -> tuple[list[dict], list[dict], dict]:
             "is_kev": True,
             "kev_date_added": date_added,
             "exploited_in_wild": True,
+            "remediation": (it.get("requiredAction") or "")[:1000] or None,
             "vendors": [it["vendor"]] if it.get("vendor") else [],
             "products": [it["product"]] if it.get("product") else [],
             "refs": [{"source": "cisa_kev", "url": n["url"], "kind": "kev"}] if n.get("url") else [],

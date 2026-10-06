@@ -1,6 +1,6 @@
 """Shared lib for sentinel-bench ingest/diff."""
 from .config import SOURCES, get_env, project_root
-from .http import http_get, http_get_json, HTTPError
+from .http_client import http_get, http_get_json, HTTPError
 from .hash import sha256_json, content_hash
 from .supabase import sb_headers, sb_url, sb_upsert_advisory, sb_upsert_vuln, sb_record_run, sb_get_source_id_cached, sb_patch_run
 from .normalize import (

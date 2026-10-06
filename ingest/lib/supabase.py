@@ -5,7 +5,7 @@ from typing import Any
 from urllib.error import HTTPError
 
 from .config import get_env
-from .http import HTTPError as HTTPGetError
+from .http_client import HTTPError as HTTPGetError
 
 
 def sb_url(project_ref: str, path: str) -> str:

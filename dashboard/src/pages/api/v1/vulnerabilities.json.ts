@@ -102,7 +102,9 @@ export const GET: APIRoute = async ({ url }) => {
       first_seen_at: vuln.first_seen_at,
       last_updated_at: vuln.last_updated_at,
       description: vuln.description,
-      remediation: vuln.remediation,
+      remediation: (vuln.remediation && vuln.remediation !== '')
+        ? vuln.remediation
+        : 'No remediation available',
       risk_score: score?.score ?? null,
       risk_factors: score?.factors ?? null,
       risk_rationale: score?.rationale ?? null,
