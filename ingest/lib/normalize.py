@@ -345,14 +345,30 @@ def normalize_nvd_to_vuln(item: dict) -> dict:
     # bulletins). ponytail: vendor list is hard-coded; expand to a lookup
     # table if we onboard more vendors.
     _VENDOR_HOSTS = (
-        "microsoft.com", "msrc.microsoft.com", "adobe.com", "cisco.com",
-        "oracle.com", "redhat.com", "vmware.com", "intel.com",
-        "chromium.org", "google.com", "apple.com", "sap.com",
+        # OS / hyperscalers
+        "microsoft.com", "msrc.microsoft.com", "apple.com", "google.com",
+        "chromium.org", "support.google.com", "support.apple.com",
+        # Browsers / runtimes
+        "mozilla.org", "oracle.com", "java.com", "openjdk.org",
+        # Vendors with high-volume advisories
+        "adobe.com", "cisco.com", "intel.com", "amd.com", "nvidia.com",
+        "redhat.com", "vmware.com", "sap.com", "ibm.com",
+        "juniper.net", "fortinet.com", "paloaltonetworks.com",
+        "citrix.com", "dell.com", "hpe.com", "lenovo.com", "broadcom.com",
+        "symantec.com", "f5.com", "checkpoint.com", "snyk.io",
+        "siemens.com", "schneider-electric.com",
+        # Linux distros
+        "ubuntu.com", "debian.org", "suse.com", "archlinux.org",
+        # Package managers / registries
+        "npmjs.com", "pypi.org", "rubygems.org", "maven.apache.org",
     )
     vendor_refs = [
         r for r in refs
         if any(host in r.get("url", "").lower() for host in _VENDOR_HOSTS)
-        and r.get("type") in ("Vendor Advisory", "Patch", "Mitigation")
+        and (
+            r.get("type") in ("Vendor Advisory", "Patch", "Mitigation")
+            or r.get("type") is None  # NVD often returns null for vendor advisories
+        )
     ]
     remediation = None
     if vendor_refs:
