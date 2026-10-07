@@ -1,0 +1,564 @@
+---
+// ThreatMap.astro — Check Point Style Live Cyber Threat Map Background
+---
+<div class="threat-map-wrapper" aria-hidden="true">
+  <canvas id="threat-map-canvas"></canvas>
+  <div class="threat-map-vignette"></div>
+  <div class="threat-ticker-bar">
+    <div class="threat-ticker-live">
+      <span class="ticker-pulse-dot"></span>
+      <span class="ticker-live-text">GLOBAL THREAT INTERCEPT</span>
+    </div>
+    <div class="threat-ticker-track" id="threat-ticker-track">
+      <div class="threat-ticker-content" id="threat-ticker-content">
+        <!-- Live stream items inserted dynamically -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .threat-map-wrapper {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  #threat-map-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0.95;
+    transition: opacity 0.3s ease;
+  }
+
+  :root[data-theme="light"] #threat-map-canvas {
+    opacity: 0.55;
+  }
+
+  /* Radial vignette for high-tech HUD depth */
+  .threat-map-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(7, 9, 14, 0.75) 90%);
+    pointer-events: none;
+  }
+
+  :root[data-theme="light"] .threat-map-vignette {
+    background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(248, 250, 252, 0.75) 90%);
+  }
+
+  /* Bottom live attack ticker */
+  .threat-ticker-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 32px;
+    background: rgba(7, 9, 14, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border-strong);
+    display: flex;
+    align-items: center;
+    z-index: 2;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    overflow: hidden;
+  }
+
+  :root[data-theme="light"] .threat-ticker-bar {
+    background: rgba(248, 250, 252, 0.9);
+  }
+
+  .threat-ticker-live {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 14px;
+    background: var(--bg-2);
+    border-right: 1px solid var(--border-strong);
+    height: 100%;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent-light);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .ticker-pulse-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: ticker-pulse 1.2s infinite ease-in-out;
+  }
+
+  @keyframes ticker-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(0.8); }
+  }
+
+  .threat-ticker-track {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .threat-ticker-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 24px;
+    white-space: nowrap;
+    animation: ticker-slide 38s linear infinite;
+    padding-left: 10px;
+    color: var(--text-dim);
+  }
+
+  .threat-ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+  }
+
+  .threat-ticker-item .cve-tag {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .threat-ticker-item .type-crit { color: var(--act-now); font-weight: 700; }
+  .threat-ticker-item .type-high { color: var(--plan-patch); font-weight: 700; }
+  .threat-ticker-item .type-cyan { color: #38bdf8; font-weight: 700; }
+  .threat-ticker-item .type-ok   { color: var(--ok); font-weight: 700; }
+
+  @keyframes ticker-slide {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+</style>
+
+<script>
+  // High-Performance Check Point Style Attack Map Simulation
+  function initThreatMap() {
+    const canvas = document.getElementById('threat-map-canvas') as HTMLCanvasElement | null;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+
+    // Major global cybersecurity hubs (Normalized 0..1 coordinates)
+    const HUBS = [
+      { id: 'NYC', name: 'New York', x: 0.28, y: 0.35, region: 'US' },
+      { id: 'SFO', name: 'San Francisco', x: 0.16, y: 0.37, region: 'US' },
+      { id: 'WDC', name: 'Washington DC', x: 0.27, y: 0.37, region: 'US' },
+      { id: 'CHI', name: 'Chicago', x: 0.23, y: 0.35, region: 'US' },
+      { id: 'LON', name: 'London', x: 0.49, y: 0.28, region: 'EU' },
+      { id: 'FRA', name: 'Frankfurt', x: 0.52, y: 0.29, region: 'EU' },
+      { id: 'AMS', name: 'Amsterdam', x: 0.51, y: 0.28, region: 'EU' },
+      { id: 'PAR', name: 'Paris', x: 0.50, y: 0.31, region: 'EU' },
+      { id: 'STO', name: 'Stockholm', x: 0.54, y: 0.22, region: 'EU' },
+      { id: 'TLV', name: 'Tel Aviv', x: 0.59, y: 0.39, region: 'ME' },
+      { id: 'DXB', name: 'Dubai', x: 0.63, y: 0.42, region: 'ME' },
+      { id: 'TYO', name: 'Tokyo', x: 0.86, y: 0.36, region: 'AP' },
+      { id: 'SEO', name: 'Seoul', x: 0.83, y: 0.35, region: 'AP' },
+      { id: 'HKG', name: 'Hong Kong', x: 0.80, y: 0.44, region: 'AP' },
+      { id: 'SIN', name: 'Singapore', x: 0.77, y: 0.58, region: 'AP' },
+      { id: 'BOM', name: 'Mumbai', x: 0.67, y: 0.46, region: 'AP' },
+      { id: 'SYD', name: 'Sydney', x: 0.89, y: 0.79, region: 'OC' },
+      { id: 'SAO', name: 'São Paulo', x: 0.34, y: 0.74, region: 'SA' },
+      { id: 'BUE', name: 'Buenos Aires', x: 0.32, y: 0.81, region: 'SA' },
+      { id: 'JNB', name: 'Johannesburg', x: 0.54, y: 0.73, region: 'AF' },
+    ];
+
+    // Threat types and color configurations
+    const THREAT_PALETTES = [
+      { name: 'KEV EXPLOIT', color: '#ef4444', glow: 'rgba(239, 68, 68, 0.4)', typeClass: 'type-crit' },
+      { name: 'RCE ZERO-DAY', color: '#ff2a2a', glow: 'rgba(255, 42, 42, 0.5)', typeClass: 'type-crit' },
+      { name: 'WEAPONIZED POC', color: '#f59e0b', glow: 'rgba(245, 158, 11, 0.4)', typeClass: 'type-high' },
+      { name: 'OT/ICS TELEMETRY', color: '#38bdf8', glow: 'rgba(56, 189, 248, 0.4)', typeClass: 'type-cyan' },
+      { name: 'ACTIVE SCANNER', color: '#10b981', glow: 'rgba(16, 185, 129, 0.4)', typeClass: 'type-ok' },
+    ];
+
+    const CVE_EXAMPLES = [
+      'CVE-2025-20352', 'CVE-2024-38077', 'CVE-2024-21413', 'CVE-2024-43451',
+      'CVE-2024-21338', 'CVE-2024-30088', 'CVE-2024-43461', 'CVE-2025-0282',
+    ];
+
+    interface AttackArc {
+      from: typeof HUBS[0];
+      to: typeof HUBS[0];
+      threat: typeof THREAT_PALETTES[0];
+      cve: string;
+      progress: number;
+      speed: number;
+      arcHeight: number;
+      curveDir: number;
+    }
+
+    interface ImpactRipple {
+      x: number;
+      y: number;
+      radius: number;
+      maxRadius: number;
+      alpha: number;
+      color: string;
+    }
+
+    interface FloatingHitTag {
+      x: number;
+      y: number;
+      text: string;
+      color: string;
+      alpha: number;
+      life: number;
+    }
+
+    const activeArcs: AttackArc[] = [];
+    const activeRipples: ImpactRipple[] = [];
+    const activeHitTags: FloatingHitTag[] = [];
+
+    // Realistic continent contours (percentage coordinates 0..100)
+    const CONTINENTS: [number, number][][] = [
+      // North America
+      [[15, 12], [22, 10], [30, 9], [34, 15], [32, 22], [35, 27], [30, 34], [25, 42], [23, 48], [19, 44], [16, 38], [12, 33], [12, 22], [14, 15]],
+      // Greenland
+      [[36, 6], [42, 5], [44, 11], [38, 13]],
+      // South America
+      [[27, 50], [33, 52], [37, 60], [35, 75], [31, 88], [28, 80], [27, 66], [24, 57]],
+      // Europe
+      [[46, 18], [54, 16], [58, 22], [55, 32], [48, 34], [44, 30], [45, 22]],
+      // Africa
+      [[46, 36], [56, 35], [60, 42], [57, 55], [54, 75], [49, 78], [45, 62], [42, 48]],
+      // Asia
+      [[58, 16], [75, 14], [88, 20], [86, 38], [80, 48], [74, 56], [68, 48], [62, 36]],
+      // Australia
+      [[83, 68], [91, 66], [94, 76], [88, 85], [82, 80]],
+      // Japan
+      [[86, 32], [88, 36], [87, 40], [85, 36]],
+      // UK
+      [[47, 24], [49, 23], [48, 28], [46, 27]]
+    ];
+
+    function resize() {
+      if (!canvas) return;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx?.scale(dpr, dpr);
+    }
+
+    function spawnAttack() {
+      if (activeArcs.length >= 14) return;
+
+      const fromIdx = Math.floor(Math.random() * HUBS.length);
+      let toIdx = Math.floor(Math.random() * HUBS.length);
+      while (toIdx === fromIdx) {
+        toIdx = Math.floor(Math.random() * HUBS.length);
+      }
+
+      const from = HUBS[fromIdx];
+      const to = HUBS[toIdx];
+      const threat = THREAT_PALETTES[Math.floor(Math.random() * THREAT_PALETTES.length)];
+      const cve = CVE_EXAMPLES[Math.floor(Math.random() * CVE_EXAMPLES.length)];
+
+      const dx = (to.x - from.x) * width;
+      const dy = (to.y - from.y) * height;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      // Arc height proportional to distance
+      const arcHeight = Math.min(Math.max(dist * 0.42, 60), 220);
+      const curveDir = Math.random() > 0.15 ? 1 : -1;
+
+      activeArcs.push({
+        from,
+        to,
+        threat,
+        cve,
+        progress: 0,
+        speed: 0.007 + Math.random() * 0.009,
+        arcHeight,
+        curveDir
+      });
+
+      // Append to HTML ticker
+      addTickerEvent(from.id, to.id, threat, cve);
+    }
+
+    function addTickerEvent(from: string, to: string, threat: typeof THREAT_PALETTES[0], cve: string) {
+      const container = document.getElementById('threat-ticker-content');
+      if (!container) return;
+
+      const now = new Date();
+      const timeStr = now.toTimeString().slice(0, 8);
+      const span = document.createElement('span');
+      span.className = 'threat-ticker-item';
+      span.innerHTML = `[${timeStr}] <strong>${from}</strong> &rarr; <strong>${to}</strong> · <span class="cve-tag">${cve}</span> <span class="${threat.typeClass}">[${threat.name}]</span>`;
+
+      container.appendChild(span);
+      // Keep ticker memory bounded
+      if (container.children.length > 25) {
+        container.removeChild(container.children[0]);
+      }
+    }
+
+    // Populate initial ticker stream
+    for (let i = 0; i < 8; i++) {
+      const f = HUBS[Math.floor(Math.random() * HUBS.length)];
+      let t = HUBS[Math.floor(Math.random() * HUBS.length)];
+      while (t.id === f.id) t = HUBS[Math.floor(Math.random() * HUBS.length)];
+      addTickerEvent(f.id, t.id, THREAT_PALETTES[i % THREAT_PALETTES.length], CVE_EXAMPLES[i % CVE_EXAMPLES.length]);
+    }
+
+    function getQuadraticBezierPoint(
+      x0: number, y0: number,
+      x1: number, y1: number,
+      x2: number, y2: number,
+      t: number
+    ) {
+      const mt = 1 - t;
+      const x = mt * mt * x0 + 2 * mt * t * x1 + t * t * x2;
+      const y = mt * mt * y0 + 2 * mt * t * y1 + t * t * y2;
+      return { x, y };
+    }
+
+    let lastTime = performance.now();
+    let spawnTimer = 0;
+
+    function render(currentTime: number) {
+      if (!ctx) return;
+      const delta = Math.min((currentTime - lastTime) / 1000, 0.1);
+      lastTime = currentTime;
+
+      spawnTimer += delta;
+      if (spawnTimer > 0.45) {
+        spawnAttack();
+        spawnTimer = 0;
+      }
+
+      ctx.clearRect(0, 0, width, height);
+
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      const landFill = isLight ? 'rgba(203, 213, 225, 0.4)' : 'rgba(18, 26, 38, 0.7)';
+      const landStroke = isLight ? 'rgba(148, 163, 184, 0.45)' : 'rgba(38, 56, 82, 0.6)';
+      const gridColor = isLight ? 'rgba(148, 163, 184, 0.15)' : 'rgba(56, 189, 248, 0.06)';
+
+      // 1. LATITUDE / LONGITUDE TACTICAL GRID
+      ctx.strokeStyle = gridColor;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 6]);
+
+      // Latitudes
+      for (let y = 0.2; y <= 0.8; y += 0.15) {
+        ctx.beginPath();
+        ctx.moveTo(0, y * height);
+        ctx.lineTo(width, y * height);
+        ctx.stroke();
+      }
+      // Longitudes
+      for (let x = 0.15; x <= 0.9; x += 0.15) {
+        ctx.beginPath();
+        ctx.moveTo(x * width, 0);
+        ctx.lineTo(x * width, height);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+
+      // 2. CONTINENTS OUTLINES
+      ctx.fillStyle = landFill;
+      ctx.strokeStyle = landStroke;
+      ctx.lineWidth = 1.2;
+
+      for (const poly of CONTINENTS) {
+        ctx.beginPath();
+        for (let i = 0; i < poly.length; i++) {
+          const px = (poly[i][0] / 100) * width;
+          const py = (poly[i][1] / 100) * height;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      // 3. TARGET HUBS (COMMAND NODES)
+      for (const hub of HUBS) {
+        const hx = hub.x * width;
+        const hy = hub.y * height;
+
+        // Core dot
+        ctx.beginPath();
+        ctx.arc(hx, hy, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = isLight ? '#0284c7' : '#38bdf8';
+        ctx.fill();
+
+        // Outer telemetry radar ring
+        ctx.beginPath();
+        ctx.arc(hx, hy, 8, 0, Math.PI * 2);
+        ctx.strokeStyle = isLight ? 'rgba(2, 132, 199, 0.3)' : 'rgba(56, 189, 248, 0.28)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Monospace city identifier
+        ctx.font = '9px "JetBrains Mono", monospace';
+        ctx.fillStyle = isLight ? '#475569' : '#8b949e';
+        ctx.fillText(hub.id, hx + 10, hy + 3);
+      }
+
+      // 4. ATTACK ARCS & FLYING COMETS
+      for (let i = activeArcs.length - 1; i >= 0; i--) {
+        const arc = activeArcs[i];
+        arc.progress += arc.speed;
+
+        const x0 = arc.from.x * width;
+        const y0 = arc.from.y * height;
+        const x2 = arc.to.x * width;
+        const y2 = arc.to.y * height;
+
+        // Arc mid control point arched upwards
+        const midX = (x0 + x2) / 2;
+        const midY = Math.min(y0, y2) - arc.arcHeight * arc.curveDir;
+
+        // Draw faint trajectory guide
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.quadraticCurveTo(midX, midY, x2, y2);
+        ctx.strokeStyle = arc.threat.glow;
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([4, 6]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Calculate current projectile position
+        const currentPos = getQuadraticBezierPoint(x0, y0, midX, midY, x2, y2, arc.progress);
+
+        // Draw glowing comet tail
+        const tailLength = 0.12;
+        const tailProgress = Math.max(arc.progress - tailLength, 0);
+        const tailPos = getQuadraticBezierPoint(x0, y0, midX, midY, x2, y2, tailProgress);
+
+        const grad = ctx.createLinearGradient(tailPos.x, tailPos.y, currentPos.x, currentPos.y);
+        grad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+        grad.addColorStop(1, arc.threat.color);
+
+        ctx.beginPath();
+        ctx.moveTo(tailPos.x, tailPos.y);
+        ctx.lineTo(currentPos.x, currentPos.y);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        // Projectile head with high-intensity glow
+        ctx.beginPath();
+        ctx.arc(currentPos.x, currentPos.y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = arc.threat.color;
+        ctx.shadowBlur = 10;
+        ctx.fill();
+        ctx.shadowBlur = 0; // reset
+
+        // When missile reaches destination (progress >= 1)
+        if (arc.progress >= 1) {
+          // Detonation ripple shockwaves
+          activeRipples.push({
+            x: x2,
+            y: y2,
+            radius: 4,
+            maxRadius: 32,
+            alpha: 0.95,
+            color: arc.threat.color
+          });
+
+          // Floating combat tag
+          activeHitTags.push({
+            x: x2,
+            y: y2 - 12,
+            text: `[${arc.threat.name}]`,
+            color: arc.threat.color,
+            alpha: 1,
+            life: 0
+          });
+
+          // Remove arc
+          activeArcs.splice(i, 1);
+        }
+      }
+
+      // 5. DETONATION SHOCKWAVES (RIPPLES)
+      for (let i = activeRipples.length - 1; i >= 0; i--) {
+        const rip = activeRipples[i];
+        rip.radius += 0.8;
+        rip.alpha -= 0.024;
+
+        if (rip.alpha <= 0 || rip.radius >= rip.maxRadius) {
+          activeRipples.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(rip.x, rip.y, rip.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = rip.color;
+        ctx.globalAlpha = rip.alpha;
+        ctx.lineWidth = 1.6;
+        ctx.stroke();
+
+        // Secondary inner ripple
+        ctx.beginPath();
+        ctx.arc(rip.x, rip.y, Math.max(rip.radius * 0.5, 1), 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 6. FLOATING THREAT TAGS ON IMPACT
+      for (let i = activeHitTags.length - 1; i >= 0; i--) {
+        const tag = activeHitTags[i];
+        tag.y -= 0.4;
+        tag.life += delta;
+        tag.alpha -= 0.018;
+
+        if (tag.alpha <= 0 || tag.life > 1.8) {
+          activeHitTags.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.globalAlpha = tag.alpha;
+        ctx.font = 'bold 9.5px "JetBrains Mono", monospace';
+        ctx.fillStyle = tag.color;
+        ctx.fillText(tag.text, tag.x - 24, tag.y);
+        ctx.restore();
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    requestAnimationFrame(render);
+  }
+
+  // Bind on page-load & client router transitions
+  initThreatMap();
+  document.addEventListener('astro:page-load', initThreatMap);
+</script>

@@ -12,76 +12,94 @@ const SUPABASE_ANON_JSON = JSON.stringify(SUPABASE_ANON);
     <!-- COLUMN 1: LEFT VENDOR SIDEBAR (Top-to-Bottom full height) -->
     <aside class="vendor-sidebar">
       <div>
-        <div class="sidebar-main-title">My Vendors</div>
-        <div class="sidebar-subtitle">Select vendors to filter the feed.</div>
+        <div class="sidebar-header-row">
+          <span class="tac-label tac-label--accent">// ASSETS</span>
+          <span class="tac-telemetry-badge">LIVE</span>
+        </div>
+        <div class="sidebar-main-title">Monitored Vendors</div>
+        <div class="sidebar-subtitle">Select vendors to isolate target surface.</div>
         <div class="vendor-search">
-          <span class="search-icon">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          </span>
-          <input id="vendor-search-input" type="text" placeholder="Filter vendors..." />
+          <span class="search-icon">&gt;</span>
+          <input id="vendor-search-input" type="text" placeholder="FILTER VENDORS..." spellcheck="false" />
         </div>
       </div>
       <div id="vendor-list-container" class="vendor-list">
-        <div style="font-size:12.5px;color:var(--muted);padding:8px">Loading vendors...</div>
+        <div class="sidebar-loading">INITIALIZING ASSET REPO...</div>
       </div>
     </aside>
 
     <!-- COLUMN 2: MIDDLE THREAT FEED -->
     <section class="feed-column">
       <div class="feed-header">
-        <div class="feed-title">Threat Vulnerability Feed</div>
+        <div class="feed-header-top">
+          <span class="tac-label tac-label--accent">// THREAT_STREAM</span>
+          <span class="status-live">
+            <span class="status-dot"></span>
+            <span class="tac-label tac-label--phosphor">FEED ONLINE</span>
+          </span>
+        </div>
+        <div class="feed-title">Active Vulnerability Stream</div>
         <div class="feed-subtitle">
-          Updated <span id="feed-updated-time">just now</span> · <span id="feed-count">0</span> vulnerabilities
+          Synchronized <span id="feed-updated-time">just now</span> · Tracking <span id="feed-count" class="feed-count-badge">—</span> advisories
         </div>
       </div>
 
       <!-- FILTER SECTIONS WRAP (Domain, Urgency & Severity) -->
       <div class="filter-sections-wrap">
-        <!-- DOMAIN FILTER (Ambos / IT / OT) -->
+        <div class="filter-wrap-header">
+          <span class="tac-label">// TELEMETRY FILTERS</span>
+          <span class="tac-filter-status">[ REAL-TIME PARSING ]</span>
+        </div>
+
+        <!-- DOMAIN FILTER (All / IT / OT) -->
         <div class="filter-row">
-          <span class="filter-row-label">Dominio</span>
-          <button class="chip-btn is-active" data-filter="domain" data-val="">Ambos</button>
-          <button class="chip-btn" data-filter="domain" data-val="IT">IT</button>
-          <button class="chip-btn" data-filter="domain" data-val="OT">OT / ICS</button>
+          <span class="filter-row-label">Domain</span>
+          <div class="chip-group">
+            <button class="chip-btn is-active" data-filter="domain" data-val="">All</button>
+            <button class="chip-btn" data-filter="domain" data-val="IT">IT</button>
+            <button class="chip-btn" data-filter="domain" data-val="OT">OT / ICS</button>
+          </div>
         </div>
 
         <!-- URGENCY TIER FILTER (Act Now, Plan Patch, Monitor, Low Risk) -->
         <div class="filter-row">
-          <span class="filter-row-label">Urgencia</span>
-          <button class="chip-btn is-active" data-filter="tier" data-val="all">Todas</button>
-          <button class="chip-btn" data-filter="tier" data-val="act">Act Now</button>
-          <button class="chip-btn" data-filter="tier" data-val="plan">Plan Patch</button>
-          <button class="chip-btn" data-filter="tier" data-val="mon">Monitor</button>
-          <button class="chip-btn" data-filter="tier" data-val="risk">Low Risk</button>
+          <span class="filter-row-label">Urgency</span>
+          <div class="chip-group">
+            <button class="chip-btn is-active" data-filter="tier" data-val="all">All</button>
+            <button class="chip-btn chip-tier-act" data-filter="tier" data-val="act">Act Now</button>
+            <button class="chip-btn chip-tier-plan" data-filter="tier" data-val="plan">Plan Patch</button>
+            <button class="chip-btn chip-tier-mon" data-filter="tier" data-val="mon">Monitor</button>
+            <button class="chip-btn chip-tier-risk" data-filter="tier" data-val="risk">Low Risk</button>
+          </div>
         </div>
 
         <!-- SEVERITY FILTER (Critical, High, Medium, Low) -->
         <div class="filter-row">
-          <span class="filter-row-label">Severidad</span>
-          <button class="chip-btn is-active" data-filter="severity" data-val="">Todas</button>
-          <button class="chip-btn chip-crit" data-filter="severity" data-val="CRITICAL">Critical</button>
-          <button class="chip-btn chip-high" data-filter="severity" data-val="HIGH">High</button>
-          <button class="chip-btn chip-med" data-filter="severity" data-val="MEDIUM">Medium</button>
-          <button class="chip-btn chip-low" data-filter="severity" data-val="LOW">Low</button>
+          <span class="filter-row-label">Severity</span>
+          <div class="chip-group">
+            <button class="chip-btn is-active" data-filter="severity" data-val="">All</button>
+            <button class="chip-btn chip-crit" data-filter="severity" data-val="CRITICAL">Critical</button>
+            <button class="chip-btn chip-high" data-filter="severity" data-val="HIGH">High</button>
+            <button class="chip-btn chip-med" data-filter="severity" data-val="MEDIUM">Medium</button>
+            <button class="chip-btn chip-low" data-filter="severity" data-val="LOW">Low</button>
+          </div>
         </div>
       </div>
 
       <!-- SEARCH, SORT & EXPORT BAR -->
       <div class="feed-actions">
         <div class="feed-search">
-          <span class="search-icon">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          </span>
-          <input id="feed-search-input" type="text" placeholder="Search advisories, CVEs, vendors..." />
+          <span class="search-icon">&gt;</span>
+          <input id="feed-search-input" type="text" placeholder="Search CVEs, vendors, keywords... [ / ]" spellcheck="false" />
         </div>
         <select id="feed-sort-select" class="select-sort">
-          <option value="score">Highest score</option>
-          <option value="newest">Most recent</option>
-          <option value="epss">Highest EPSS</option>
+          <option value="score">Sort: Highest Score</option>
+          <option value="newest">Sort: Most Recent</option>
+          <option value="epss">Sort: Highest EPSS</option>
         </select>
         <button id="btn-export-csv" class="btn-export">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span>Export CSV</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>[ EXPORT CSV ]</span>
         </button>
       </div>
 
@@ -432,10 +450,20 @@ const SUPABASE_ANON_JSON = JSON.stringify(SUPABASE_ANON);
         renderAll();
       });
 
+      // Keyboard shortcut: '/' to focus feed search
+      window.addEventListener('keydown', (e) => {
+        if (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          const input = document.getElementById('feed-search-input') as HTMLInputElement | null;
+          input?.focus();
+          input?.select();
+        }
+      });
+
       // CSV Export
       document.getElementById('btn-export-csv')?.addEventListener('click', () => {
         const filtered = sortRows(applyFilters(state.rows));
-        if (!filtered.length) return alert('No hay vulnerabilidades para exportar.');
+        if (!filtered.length) return alert('No vulnerabilities to export.');
 
         const headers = ['CVE_ID', 'Domain', 'Score', 'CVSS', 'EPSS', 'KEV', 'Exploited_In_Wild', 'PoC_Public', 'Vendors', 'Description'];
         const csvRows = [headers.join(',')];

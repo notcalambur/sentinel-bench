@@ -33,52 +33,54 @@ const { title = 'Sentinel-Bench — CTI Vulnerability Feed', active = 'feed', hi
 </head>
 <body>
 
-  <!-- HIGH-TECH CYBERSECURITY WORLD MAP & NETWORK LINES BACKGROUND -->
-  <div class="cyber-bg-overlay" aria-hidden="true">
-    <svg class="cyber-world-map" viewBox="0 0 1200 600" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Cyber Grid Lines -->
-      <path d="M0 100 H1200 M0 200 H1200 M0 300 H1200 M0 400 H1200 M0 500 H1200" stroke="var(--accent)" stroke-opacity="0.07" stroke-dasharray="4 8"/>
-      <path d="M200 0 V600 M400 0 V600 M600 0 V600 M800 0 V600 M1000 0 V600" stroke="var(--accent)" stroke-opacity="0.07" stroke-dasharray="4 8"/>
-      
-      <!-- Stylized World Map Continents Outline (Monochrome Cyber Vectors) -->
-      <!-- North America -->
-      <path d="M150 120 C180 110, 260 100, 310 140 C340 170, 300 240, 250 260 C210 270, 180 230, 140 190 Z" fill="var(--accent)" fill-opacity="0.04" stroke="var(--accent)" stroke-opacity="0.2" stroke-width="1.2"/>
-      <!-- South America -->
-      <path d="M280 290 C320 310, 350 370, 330 440 C310 490, 270 470, 260 390 C255 340, 265 300, 280 290 Z" fill="var(--accent)" fill-opacity="0.04" stroke="var(--accent)" stroke-opacity="0.2" stroke-width="1.2"/>
-      <!-- Europe & Africa -->
-      <path d="M540 110 C590 100, 640 130, 620 180 C580 200, 520 170, 530 130 Z" fill="var(--accent)" fill-opacity="0.04" stroke="var(--accent)" stroke-opacity="0.2" stroke-width="1.2"/>
-      <path d="M550 210 C620 220, 660 280, 630 380 C590 440, 540 390, 530 300 C525 240, 535 220, 550 210 Z" fill="var(--accent)" fill-opacity="0.04" stroke="var(--accent)" stroke-opacity="0.2" stroke-width="1.2"/>
-      <!-- Asia & Australia -->
-      <path d="M660 100 C780 80, 920 120, 950 220 C900 270, 750 250, 680 180 Z" fill="var(--accent)" fill-opacity="0.04" stroke="var(--accent)" stroke-opacity="0.2" stroke-width="1.2"/>
-      <path d="M880 340 C950 350, 970 420, 930 460 C870 480, 840 430, 860 370 Z" fill="var(--accent)" fill-opacity="0.04" stroke="var(--accent)" stroke-opacity="0.2" stroke-width="1.2"/>
+  <!-- HIGH-TECH CYBERSECURITY WORLD MAP & NETWORK LINES BACKGROUND (Static fallback for subpages) -->
+  {active !== 'landing' && (
+    <div class="cyber-bg-overlay" aria-hidden="true">
+      <svg class="cyber-world-map" viewBox="0 0 1200 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Cyber Grid Lines -->
+        <path d="M0 100 H1200 M0 200 H1200 M0 300 H1200 M0 400 H1200 M0 500 H1200" stroke="var(--accent)" stroke-opacity="0.07" stroke-dasharray="4 8"/>
+        <path d="M200 0 V600 M400 0 V600 M600 0 V600 M800 0 V600 M1000 0 V600" stroke="var(--accent)" stroke-opacity="0.07" stroke-dasharray="4 8"/>
+        
+        <!-- Stylized World Map Continents Outline (Monochrome Cyber Vectors) -->
+        <!-- North America -->
+        <path d="M150 120 C180 110, 260 100, 310 140 C340 170, 300 240, 250 260 C210 270, 180 230, 140 190 Z" fill="var(--accent)" fill-opacity="0.04" stroke="var(--accent)" stroke-opacity="0.2" stroke-width="1.2"/>
+        <!-- South America -->
+        <path d="M280 290 C320 310, 350 370, 330 440 C310 490, 270 470, 260 390 C255 340, 265 300, 280 290 Z" fill="var(--accent)" fill-opacity="0.04" stroke="var(--accent)" stroke-opacity="0.2" stroke-width="1.2"/>
+        <!-- Europe & Africa -->
+        <path d="M540 110 C590 100, 640 130, 620 180 C580 200, 520 170, 530 130 Z" fill="var(--accent)" fill-opacity="0.04" stroke="var(--accent)" stroke-opacity="0.2" stroke-width="1.2"/>
+        <path d="M550 210 C620 220, 660 280, 630 380 C590 440, 540 390, 530 300 C525 240, 535 220, 550 210 Z" fill="var(--accent)" fill-opacity="0.04" stroke="var(--accent)" stroke-opacity="0.2" stroke-width="1.2"/>
+        <!-- Asia & Australia -->
+        <path d="M660 100 C780 80, 920 120, 950 220 C900 270, 750 250, 680 180 Z" fill="var(--accent)" fill-opacity="0.04" stroke="var(--accent)" stroke-opacity="0.2" stroke-width="1.2"/>
+        <path d="M880 340 C950 350, 970 420, 930 460 C870 480, 840 430, 860 370 Z" fill="var(--accent)" fill-opacity="0.04" stroke="var(--accent)" stroke-opacity="0.2" stroke-width="1.2"/>
 
-      <!-- Global Cyber Attack Vectors & Arc Lines -->
-      <path d="M 230 180 Q 420 80 580 140" stroke="var(--accent-light)" stroke-opacity="0.4" stroke-width="1.5" stroke-dasharray="6 6"/>
-      <path d="M 580 140 Q 750 100 850 160" stroke="var(--accent-light)" stroke-opacity="0.4" stroke-width="1.5" stroke-dasharray="6 6"/>
-      <path d="M 280 340 Q 450 250 560 300" stroke="var(--accent-light)" stroke-opacity="0.3" stroke-width="1.5" stroke-dasharray="6 6"/>
-      <path d="M 850 160 Q 900 280 890 380" stroke="var(--accent-light)" stroke-opacity="0.3" stroke-width="1.5" stroke-dasharray="6 6"/>
+        <!-- Global Cyber Attack Vectors & Arc Lines -->
+        <path d="M 230 180 Q 420 80 580 140" stroke="var(--accent-light)" stroke-opacity="0.4" stroke-width="1.5" stroke-dasharray="6 6"/>
+        <path d="M 580 140 Q 750 100 850 160" stroke="var(--accent-light)" stroke-opacity="0.4" stroke-width="1.5" stroke-dasharray="6 6"/>
+        <path d="M 280 340 Q 450 250 560 300" stroke="var(--accent-light)" stroke-opacity="0.3" stroke-width="1.5" stroke-dasharray="6 6"/>
+        <path d="M 850 160 Q 900 280 890 380" stroke="var(--accent-light)" stroke-opacity="0.3" stroke-width="1.5" stroke-dasharray="6 6"/>
 
-      <!-- Pulsing Cyber Nodes / Target Hubs -->
-      <circle cx="230" cy="180" r="4" fill="var(--accent-light)" fill-opacity="0.8"/>
-      <circle cx="230" cy="180" r="10" stroke="var(--accent)" stroke-opacity="0.4" stroke-width="1.5"/>
+        <!-- Pulsing Cyber Nodes / Target Hubs -->
+        <circle cx="230" cy="180" r="4" fill="var(--accent-light)" fill-opacity="0.8"/>
+        <circle cx="230" cy="180" r="10" stroke="var(--accent)" stroke-opacity="0.4" stroke-width="1.5"/>
 
-      <circle cx="580" cy="140" r="4" fill="var(--accent-light)" fill-opacity="0.8"/>
-      <circle cx="580" cy="140" r="10" stroke="var(--accent)" stroke-opacity="0.4" stroke-width="1.5"/>
+        <circle cx="580" cy="140" r="4" fill="var(--accent-light)" fill-opacity="0.8"/>
+        <circle cx="580" cy="140" r="10" stroke="var(--accent)" stroke-opacity="0.4" stroke-width="1.5"/>
 
-      <circle cx="850" cy="160" r="4" fill="var(--accent-light)" fill-opacity="0.8"/>
-      <circle cx="850" cy="160" r="10" stroke="var(--accent)" stroke-opacity="0.4" stroke-width="1.5"/>
+        <circle cx="850" cy="160" r="4" fill="var(--accent-light)" fill-opacity="0.8"/>
+        <circle cx="850" cy="160" r="10" stroke="var(--accent)" stroke-opacity="0.4" stroke-width="1.5"/>
 
-      <circle cx="280" cy="340" r="4" fill="var(--accent-light)" fill-opacity="0.8"/>
-      <circle cx="280" cy="340" r="10" stroke="var(--accent)" stroke-opacity="0.4" stroke-width="1.5"/>
+        <circle cx="280" cy="340" r="4" fill="var(--accent-light)" fill-opacity="0.8"/>
+        <circle cx="280" cy="340" r="10" stroke="var(--accent)" stroke-opacity="0.4" stroke-width="1.5"/>
 
-      <circle cx="890" cy="380" r="4" fill="var(--accent-light)" fill-opacity="0.8"/>
-      <circle cx="890" cy="380" r="10" stroke="var(--accent)" stroke-opacity="0.4" stroke-width="1.5"/>
-    </svg>
-  </div>
+        <circle cx="890" cy="380" r="4" fill="var(--accent-light)" fill-opacity="0.8"/>
+        <circle cx="890" cy="380" r="10" stroke="var(--accent)" stroke-opacity="0.4" stroke-width="1.5"/>
+      </svg>
+    </div>
+  )}
 
   <div class="nav-wrap">
     <header class="nav">
-      <a href="/dashboard/" class="brand">
+      <a href="/" class="brand">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           <path d="m9 12 2 2 4-4"/>
@@ -88,14 +90,12 @@ const { title = 'Sentinel-Bench — CTI Vulnerability Feed', active = 'feed', hi
       <nav>
         {!hideNavLinks && (
           <>
+            <a href="/" class:list={[{ 'is-active': active === 'landing' }]}>Home</a>
             <a href="/dashboard/" class:list={[{ 'is-active': active === 'feed' || active === 'dashboard' }]}>Feed</a>
             <a href="/sources/" class:list={[{ 'is-active': active === 'sources' }]}>Sources</a>
             <a href="/status/" class:list={[{ 'is-active': active === 'status' }]}>Status</a>
             <a href="/about/" class:list={[{ 'is-active': active === 'about' }]}>About</a>
           </>
-        )}
-        {active === 'landing' && (
-          <a href="/dashboard/" class="nav-cta">Open Dashboard →</a>
         )}
       </nav>
       <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme (Light / Dark)" title="Toggle theme">
@@ -124,7 +124,7 @@ const { title = 'Sentinel-Bench — CTI Vulnerability Feed', active = 'feed', hi
       <div style="font-weight: 600; color: var(--fg); margin-bottom: 4px;">Donations (SOL Mainnet)</div>
       <code style="font-family: var(--font-mono, ui-monospace, Menlo, monospace); font-size: 11px; word-break: break-all;">8ZNN5bomP4SVfDthfcFgXBSoZAgtngZAcKscddhoPrGA</code>
     </div>
-    <small>Sentinel-Bench · CTI Intelligence Abierta · CISA KEV · NVD · EPSS · GHSA · MSRC · <a href="https://github.com/iamtweaks/sentinel-bench" rel="noopener" target="_blank" style="color:var(--accent-light)">GitHub Repo</a></small>
+    <small>Sentinel-Bench · Open Cyber Threat Intelligence · CISA KEV · NVD · EPSS · GHSA · MSRC · <a href="https://github.com/iamtweaks/sentinel-bench" rel="noopener" target="_blank" style="color:var(--accent-light)">GitHub Repo</a></small>
   </footer>
 
   <script>

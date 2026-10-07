@@ -70,8 +70,11 @@ export function renderAdvisoryCard(r: any, isActive: boolean = false, index: num
 
   return `
     <article class="advisory-card ${activeClass}" data-cve="${cve}" style="--delay: ${delayMs}ms">
-      <span class="card-urgency-badge ${status}">${statusLabel(status)}</span>
-      <div class="card-badges">${badges.join('')}</div>
+      <div class="card-top-row">
+        <span class="card-urgency-badge ${status}">[ ${statusLabel(status).toUpperCase()} ]</span>
+        <span class="card-domain-badge ${r.domain === 'OT' ? 'badge-domain-ot' : 'badge-domain-it'}">${escapeHtml(r.domain || 'IT')}</span>
+        <div class="card-badges">${badges.join('')}</div>
+      </div>
       <div class="card-title">${escapeHtml(truncate(desc.length > 30 ? desc.slice(0, 75) : title, 80))}</div>
       <div class="card-summary">${escapeHtml(truncate(desc, 160))}</div>
       <div class="card-tags">
@@ -79,8 +82,8 @@ export function renderAdvisoryCard(r: any, isActive: boolean = false, index: num
         ${(v.products || []).slice(0, 2).map((p: string) => `<span class="vendor-tag">${escapeHtml(p)}</span>`).join('')}
       </div>
       <div class="card-footer">
-        <div>${fixText} · <strong>${cve}</strong></div>
-        <div>${escapeHtml(when)}</div>
+        <div class="card-footer-fix">${fixText} · <strong class="card-cve-mono">${cve}</strong></div>
+        <div class="card-footer-meta">${v.cvss_v3_score != null ? `<span class="card-score-badge">CVSS ${v.cvss_v3_score.toFixed(1)}</span>` : ''} <span>${escapeHtml(when)}</span></div>
       </div>
     </article>
   `;
@@ -182,21 +185,21 @@ export function renderDetailPanel(container: HTMLElement, row: any | null, onClo
     <div class="drawer-header-bar">
       <div class="drawer-header-top">
         <div class="drawer-title-block">
-          <span class="drawer-cve-id">${escapeHtml(row.cve_id)}</span>
-          <span class="drawer-title">${escapeHtml(vendor)} — ${escapeHtml(truncate(v.description || row.rationale || 'Security Advisory', 80))}</span>
+          <span class="drawer-cve-id">// ${escapeHtml(row.cve_id)} — INCIDENT ANALYSIS</span>
+          <span class="drawer-title">${escapeHtml(vendor)}: ${escapeHtml(truncate(v.description || row.rationale || 'Security Advisory', 80))}</span>
         </div>
         <div class="drawer-actions">
-          <button class="drawer-action-btn" id="btn-share-drawer" title="Copy link">${shareIcon} Share</button>
-          <button class="drawer-close-btn" id="btn-close-drawer" aria-label="Close drawer">${closeBtnSvg}</button>
+          <button class="drawer-action-btn" id="btn-share-drawer" title="Copy link">${shareIcon} [ SHARE ]</button>
+          <button class="drawer-close-btn" id="btn-close-drawer" aria-label="Close drawer" title="Close">${closeBtnSvg}</button>
         </div>
       </div>
 
       <!-- STATUS PILLS ROW: status + CVSS + advisory ID + date -->
       <div class="drawer-pills">
-        <span class="drawer-pill ${statusPillClass}">${escapeHtml(statusName)}</span>
+        <span class="drawer-pill ${statusPillClass}">[ ${escapeHtml(statusName).toUpperCase()} ]</span>
         ${cvss ? `<span class="drawer-pill pill-neutral">CVSS ${escapeHtml(cvss)}</span>` : ''}
         ${epss ? `<span class="drawer-pill pill-neutral">EPSS ${escapeHtml(epss)}</span>` : ''}
-        ${v.is_kev ? `<span class="drawer-pill pill-act">KEV</span>` : ''}
+        ${v.is_kev ? `<span class="drawer-pill pill-act">CISA KEV</span>` : ''}
         ${v.poc_public ? `<span class="drawer-pill pill-plan">PoC</span>` : ''}
         <span class="drawer-pill pill-neutral">${escapeHtml(fullDate)}</span>
       </div>
@@ -205,12 +208,12 @@ export function renderDetailPanel(container: HTMLElement, row: any | null, onClo
     <div class="drawer-body">
       <!-- ATTACK PATH (CVSS-derived) -->
       <div class="drawer-section">
-        <div class="drawer-section-label">Attack Path</div>
+        <div class="drawer-section-label">// 01 ATTACK PATH SCHEMATIC</div>
         <div class="attack-path-container">
           <div class="attack-path-flow">
             <div class="attack-step">
               <div class="step-icon">${globeIcon}</div>
-              <div class="step-label">Attack Vector</div>
+              <div class="step-label">Vector</div>
               <div class="step-val">${escapeHtml(attackVector)}</div>
             </div>
             <div class="attack-step">
@@ -225,7 +228,7 @@ export function renderDetailPanel(container: HTMLElement, row: any | null, onClo
             </div>
             <div class="attack-step">
               <div class="step-icon">${userIcon}</div>
-              <div class="step-label">User Interaction</div>
+              <div class="step-label">Interaction</div>
               <div class="step-val">${escapeHtml(userInteraction)}</div>
             </div>
           </div>
@@ -234,24 +237,24 @@ export function renderDetailPanel(container: HTMLElement, row: any | null, onClo
 
       <!-- SUMMARY -->
       <div class="drawer-section">
-        <div class="drawer-section-label">Summary</div>
+        <div class="drawer-section-label">// 02 EXECUTIVE SUMMARY</div>
         <div class="detail-summary-text">${escapeHtml(desc)}</div>
       </div>
 
       <!-- WHAT THIS MEANS -->
       <div class="drawer-section">
-        <div class="drawer-section-label">What This Means</div>
+        <div class="drawer-section-label">// 03 IMPACT &amp; AT-RISK ASSETS</div>
         <div class="meaning-list">
           <div class="meaning-item">
             <div>
-              <strong>What could happen</strong>
+              <strong>Potential Impact</strong>
               ${escapeHtml(whatCouldHappen)}
             </div>
           </div>
           ${showAtRisk ? `
           <div class="meaning-item">
             <div>
-              <strong>Who's at risk</strong>
+              <strong>Affected Products &amp; Vendors</strong>
               ${escapeHtml(atRiskText)}
             </div>
           </div>
@@ -262,7 +265,7 @@ export function renderDetailPanel(container: HTMLElement, row: any | null, onClo
       <!-- REFERENCES -->
       ${refsList.length ? `
       <div class="drawer-section">
-        <div class="drawer-section-label">References</div>
+        <div class="drawer-section-label">// 04 INTEL REFERENCES</div>
         <ul class="refs-list">
           ${refsList.slice(0, 8).map(r => `
             <li>
@@ -279,7 +282,7 @@ export function renderDetailPanel(container: HTMLElement, row: any | null, onClo
       <!-- POC URLS -->
       ${pocList.length ? `
       <div class="drawer-section">
-        <div class="drawer-section-label">PoC URLs</div>
+        <div class="drawer-section-label">// 05 POC EXPLOIT REPOSITORIES</div>
         <ul class="refs-list">
           ${pocList.slice(0, 8).map(u => `
             <li>
@@ -295,16 +298,16 @@ export function renderDetailPanel(container: HTMLElement, row: any | null, onClo
 
       <!-- REMEDIATION -->
       <div class="drawer-section">
-        <div class="drawer-section-label">Remediation</div>
+        <div class="drawer-section-label">// 06 REMEDIATION DIRECTIVES</div>
         ${v.remediation ? `
           <div class="remediation-text">${escapeHtml(v.remediation)}</div>
         ` : `
-          <div class="detail-summary-text" style="color:var(--text-dim);font-style:italic">No remediation info available. Check vendor advisories above.</div>
+          <div class="detail-summary-text" style="color:var(--text-dim);font-style:italic">No official remediation directive indexed. Consult vendor advisories above.</div>
         `}
       </div>
 
       <div style="font-size:10.5px;color:var(--text-dim);font-family:var(--font-mono);text-align:right;margin-top:auto">
-        Updated ${escapeHtml(when)}
+        TELEMETRY_UPDATED: ${escapeHtml(when)}
       </div>
     </div>
   `;
@@ -316,8 +319,8 @@ export function renderDetailPanel(container: HTMLElement, row: any | null, onClo
       try {
         if (navigator.clipboard && shareUrl) {
           await navigator.clipboard.writeText(shareUrl);
-          shareBtn.textContent = '✓ Copied';
-          setTimeout(() => { shareBtn.innerHTML = `${shareIcon} Share`; }, 1500);
+          shareBtn.textContent = '✓ COPIED';
+          setTimeout(() => { shareBtn.innerHTML = `${shareIcon} [ SHARE ]`; }, 1500);
         }
       } catch {
         // ponytail: clipboard blocked — fail silently; user can copy from URL bar.
@@ -329,19 +332,20 @@ export function renderDetailPanel(container: HTMLElement, row: any | null, onClo
 export function renderVendorSidebar(container: HTMLElement, vendorCounts: Record<string, number>, selectedVendors: Set<string>, onToggle: (vendor: string) => void) {
   const vendors = Object.keys(vendorCounts).sort((a, b) => vendorCounts[b] - vendorCounts[a]);
   if (!vendors.length) {
-    container.innerHTML = `<div style="font-size:12px;color:var(--muted)">Loading vendors...</div>`;
+    container.innerHTML = `<div class="sidebar-loading">NO MONITORED VENDORS</div>`;
     return;
   }
 
-  container.innerHTML = vendors.slice(0, 35).map(v => {
+  container.innerHTML = vendors.slice(0, 40).map(v => {
     const isChecked = selectedVendors.has(v);
+    const countStr = String(vendorCounts[v]).padStart(2, '0');
     return `
       <div class="vendor-item ${isChecked ? 'is-selected' : ''}" data-vendor="${escapeHtml(v)}">
         <label>
           <input type="checkbox" ${isChecked ? 'checked' : ''} />
-          <span>${escapeHtml(v)}</span>
+          <span class="vendor-name">${escapeHtml(v)}</span>
         </label>
-        <span class="vendor-count">${vendorCounts[v]}</span>
+        <span class="vendor-count">${countStr}</span>
       </div>
     `;
   }).join('');

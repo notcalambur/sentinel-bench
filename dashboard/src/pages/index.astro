@@ -1,8 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
+import ThreatMap from '../components/ThreatMap.astro';
 ---
 
 <Base title="Sentinel-Bench — Personal Cyber Threat Intelligence" active="landing">
+
+  <ThreatMap />
 
   <main class="landing landing-page">
 
@@ -79,7 +82,7 @@ import Base from '../layouts/Base.astro';
       </div>
     </section>
 
-    <!-- POR QUÉ IMPORTA -->
+    <!-- WHY IT MATTERS -->
     <section class="why">
       <div class="why-grid">
         <div class="why-copy">
@@ -275,8 +278,13 @@ import Base from '../layouts/Base.astro';
     }
     .stat {
       padding: 24px 22px;
-      background: var(--bg);
+      background: rgba(7, 9, 14, 0.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border-right: 1px solid var(--border-2);
+    }
+    :root[data-theme="light"] .stat {
+      background: rgba(248, 250, 252, 0.82);
     }
     .stat:last-child { border-right: none; }
     .stat-num {
@@ -340,14 +348,22 @@ import Base from '../layouts/Base.astro';
       border: 1px solid var(--border-2);
     }
     .feature {
-      background: var(--bg);
+      background: rgba(7, 9, 14, 0.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       padding: 26px 22px 22px;
       border-right: 1px solid var(--border-2);
       transition: background 0.12s ease;
     }
+    :root[data-theme="light"] .feature {
+      background: rgba(248, 250, 252, 0.82);
+    }
     .feature:last-child { border-right: none; }
     .feature:hover {
-      background: var(--panel);
+      background: rgba(20, 26, 36, 0.9);
+    }
+    :root[data-theme="light"] .feature:hover {
+      background: rgba(238, 242, 246, 0.95);
     }
     .feature-num {
       font-family: var(--font-mono);
@@ -388,9 +404,14 @@ import Base from '../layouts/Base.astro';
       border: 1px solid var(--border-2);
     }
     .why-copy {
-      background: var(--bg);
+      background: rgba(7, 9, 14, 0.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       padding: 28px 26px;
       border-right: 1px solid var(--border-2);
+    }
+    :root[data-theme="light"] .why-copy {
+      background: rgba(248, 250, 252, 0.82);
     }
     .why-copy p {
       font-size: 15px;
@@ -403,8 +424,13 @@ import Base from '../layouts/Base.astro';
       font-weight: 700;
     }
     .why-side {
-      background: var(--bg);
+      background: rgba(7, 9, 14, 0.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       padding: 0;
+    }
+    :root[data-theme="light"] .why-side {
+      background: rgba(248, 250, 252, 0.82);
     }
     .why-stat {
       padding: 22px 24px;
@@ -472,23 +498,7 @@ import Base from '../layouts/Base.astro';
       color: var(--muted);
     }
 
-    /* NAV CTA pill (overrides Base.astro nav) */
-    :global(.landing-page) header.nav a.nav-cta {
-      color: var(--accent) !important;
-      padding: 5px 12px !important;
-      font-family: var(--font-mono) !important;
-      font-weight: 700 !important;
-      font-size: 11px !important;
-      letter-spacing: 0.1em !important;
-      text-transform: uppercase !important;
-      border: 1px solid var(--accent) !important;
-      border-radius: 0 !important;
-      transition: background 0.12s ease;
-    }
-    :global(.landing-page) header.nav a.nav-cta:hover {
-      background: var(--accent);
-      color: var(--text) !important;
-    }
+
 
     @media (max-width: 880px) {
       .hero { padding: 56px 0 40px; }
